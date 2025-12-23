@@ -45,18 +45,24 @@ regd_users.post("/login", (req, res) => {
 // Add or update a book review
 regd_users.put("/auth/review/:isbn", (req, res) => {
     const isbn = req.params.isbn;
-    const { review } = req.body;
-    const username = req.user.username; // Obtained from JWT middleware
+    const review = req.query.review;        // ✅ review from query
+    const username = req.user.username;     // ✅ username from session/JWT
 
+    // Check if book exists
     if (!books[isbn]) {
         return res.status(404).json({ message: "Book not found" });
     }
 
-    // Add or update review for this user
+    // Check if review is provided
+    if (!review) {
+        return res.status(400).json({ message: "Review query is required" });
+    }
+
+    // Add or update review
     books[isbn].reviews[username] = review;
 
     return res.status(200).json({
-        message: `Review added/updated successfully for ISBN ${isbn}`,
+        message: "Review added/updated successfully",
         reviews: books[isbn].reviews
     });
 });
